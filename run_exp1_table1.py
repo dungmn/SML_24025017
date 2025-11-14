@@ -146,8 +146,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
     # create model
 
-    # archs = ['vgg16','resnet50','densenet201']
-    archs = ['vgg16']
+    archs = ['vgg16','resnet50','densenet201']
+    # archs = ['vgg16']
 
     jaggArchs = []
     for n in archs:
@@ -225,7 +225,7 @@ def main_worker(gpu, ngpus_per_node, args):
         #     train_sampler = None
 
 
-        Sizes = np.arange(1,2.1,0.3)
+        Sizes = np.arange(0.1,2.1,0.3)
         SizesLoaders = []
         for s in Sizes:
             if (s<=1.1):

@@ -324,6 +324,19 @@ def JaggedNess(L, model,args,size):
                     inputs1 = input[:,:,c:c+224,c:c+224].cuda()
                     inputs2 = input[:,:,c+1:c+224+1,c+1:c+224+1].cuda()
 
+                    # Visualize input image
+                    I = np.squeeze(inputs1.detach().cpu().numpy())
+                    I = np.transpose(I,(1,2,0))
+                    plt.close('all')
+                    plt.imshow(I)
+                    plt.savefig(f'images/crop_image_1_{i}.png',bbox_inches='tight')
+
+                    I2 = np.squeeze(inputs2.detach().cpu().numpy())
+                    I2 = np.transpose(I2,(1,2,0))
+                    plt.close('all')
+                    plt.imshow(I2)
+                    plt.savefig(f'images/crop_image_2_{i}.png',bbox_inches='tight')
+
                     target = target.cuda()
 
 
@@ -349,10 +362,20 @@ def JaggedNess(L, model,args,size):
 
                     inputs1[:,:,c:c+input.shape[3],c:c+input.shape[3]] = input.cuda()
                     inputs2[:,:,c+1:c+input.shape[3]+1,c+1:c+input.shape[3]+1] = input.cuda()
-                    # I = np.squeeze(inputs1.detach().cpu().numpy())
-                    # I = np.transpose(I,(1,2,0))
-                    # plt.close('all')
-                    # plt.imshow(I)
+
+                    # Visualize input image
+                    I = np.squeeze(inputs1.detach().cpu().numpy())
+                    I = np.transpose(I,(1,2,0))
+                    plt.close('all')
+                    plt.imshow(I)
+                    plt.savefig(f'images/black_image_1_{i}.png',bbox_inches='tight')
+
+                    I2 = np.squeeze(inputs2.detach().cpu().numpy())
+                    I2 = np.transpose(I2,(1,2,0))
+                    plt.close('all')
+                    plt.imshow(I2)
+                    plt.savefig(f'images/black_image_2_{i}.png',bbox_inches='tight')
+
                     # plt.show()
                     target = target.cuda()
                     # target[target == 0] = 155

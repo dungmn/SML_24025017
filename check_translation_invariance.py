@@ -27,8 +27,9 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 import numpy as np
-from matplotlib import gridspec
+import matplotlib
 matplotlib.use("Agg")
+from matplotlib import gridspec
 from matplotlib import pyplot as plt
 
 model_names = sorted(name for name in models.__dict__
@@ -145,7 +146,9 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
     # create model
 
-    archs = ['vgg16','resnet50','densenet201']
+    # archs = ['vgg16','resnet50','densenet201']
+    archs = ['vgg16']
+
     jaggArchs = []
     for n in archs:
         if args.pretrained:
@@ -202,27 +205,27 @@ def main_worker(gpu, ngpus_per_node, args):
         cudnn.benchmark = True
 
         # Data loading code
-        traindir = os.path.join(args.data, 'train')
+        # traindir = os.path.join(args.data, 'train')
         valdir = os.path.join(args.data, 'val')
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
 
-        train_dataset = datasets.ImageFolder(
-            valdir,
-            transforms.Compose([
-                transforms.RandomResizedCrop(224, scale=(0.3, 0.8)),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                normalize,
-            ]))
+        # train_dataset = datasets.ImageFolder(
+        #     valdir,
+        #     transforms.Compose([
+        #         transforms.RandomResizedCrop(224, scale=(0.3, 0.8)),
+        #         transforms.RandomHorizontalFlip(),
+        #         transforms.ToTensor(),
+        #         normalize,
+        #     ]))
 
-        if args.distributed:
-            train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-        else:
-            train_sampler = None
+        # if args.distributed:
+        #     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        # else:
+        #     train_sampler = None
 
 
-        Sizes = np.arange(0.1,2.1,0.3)
+        Sizes = np.arange(1,2.1,0.3)
         SizesLoaders = []
         for s in Sizes:
             if (s<=1.1):
@@ -230,7 +233,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     datasets.ImageFolder(valdir, transforms.Compose([
                         transforms.RandomResizedCrop(234, scale=(s, s)),
                         transforms.ToTensor(),
-                        normalize,
+                        # normalize,
                     ])),
                     batch_size=1, shuffle=True,
                     num_workers=args.workers, pin_memory=True))
@@ -240,7 +243,7 @@ def main_worker(gpu, ngpus_per_node, args):
                         transforms.RandomResizedCrop(int(224/s), scale=(1, 1)),
                         # transforms.ColorJitter(brightness=(1,1), contrast=(3.5,3.5), saturation=(1,1)),
                         transforms.ToTensor(),
-                        normalize,
+                        # normalize,
                     ])),
                     batch_size=1, shuffle=True,
                     num_workers=args.workers, pin_memory=True))
@@ -325,17 +328,27 @@ def JaggedNess(L, model,args,size):
                     inputs2 = input[:,:,c+1:c+224+1,c+1:c+224+1].cuda()
 
                     # Visualize input image
-                    I = np.squeeze(inputs1.detach().cpu().numpy())
-                    I = np.transpose(I,(1,2,0))
-                    plt.close('all')
-                    plt.imshow(I)
-                    plt.savefig(f'images/crop_image_1_{i}.png',bbox_inches='tight')
+                    if i < 20:
+                        plt.figure(figsize=(8, 4))
 
-                    I2 = np.squeeze(inputs2.detach().cpu().numpy())
-                    I2 = np.transpose(I2,(1,2,0))
-                    plt.close('all')
-                    plt.imshow(I2)
-                    plt.savefig(f'images/crop_image_2_{i}.png',bbox_inches='tight')
+                        plt.subplot(121)
+                        I = np.squeeze(inputs1.detach().cpu().numpy())
+                        I = np.transpose(I, (1, 2, 0))
+                        plt.title('Cropped Image')
+                        plt.imshow(I)
+                        plt.axis('off')
+
+                        plt.subplot(122)
+                        I2 = np.squeeze(inputs2.detach().cpu().numpy())
+                        I2 = np.transpose(I2, (1, 2, 0))
+                        plt.title('Translated Right 1-Pixel Image')
+                        plt.imshow(I2)
+                        plt.axis('off')
+
+                        plt.tight_layout()
+                        plt.savefig(f'images/crop_image_{i}.png', bbox_inches='tight')
+                        plt.close()
+                
 
                     target = target.cuda()
 
@@ -364,17 +377,26 @@ def JaggedNess(L, model,args,size):
                     inputs2[:,:,c+1:c+input.shape[3]+1,c+1:c+input.shape[3]+1] = input.cuda()
 
                     # Visualize input image
-                    I = np.squeeze(inputs1.detach().cpu().numpy())
-                    I = np.transpose(I,(1,2,0))
-                    plt.close('all')
-                    plt.imshow(I)
-                    plt.savefig(f'images/black_image_1_{i}.png',bbox_inches='tight')
+                    if i < 20:
+                        plt.figure(figsize=(8, 4))
 
-                    I2 = np.squeeze(inputs2.detach().cpu().numpy())
-                    I2 = np.transpose(I2,(1,2,0))
-                    plt.close('all')
-                    plt.imshow(I2)
-                    plt.savefig(f'images/black_image_2_{i}.png',bbox_inches='tight')
+                        plt.subplot(121)
+                        I = np.squeeze(inputs1.detach().cpu().numpy())
+                        I = np.transpose(I, (1, 2, 0))
+                        plt.title('Black Image')
+                        plt.imshow(I)
+                        plt.axis('off')
+
+                        plt.subplot(122)
+                        I2 = np.squeeze(inputs2.detach().cpu().numpy())
+                        I2 = np.transpose(I2, (1, 2, 0))
+                        plt.title('Translated Right 1-Pixel Image')
+                        plt.imshow(I2)
+                        plt.axis('off')
+
+                        plt.tight_layout()
+                        plt.savefig(f'images/black_image_{i}.png', bbox_inches='tight')
+                        plt.close()
 
                     # plt.show()
                     target = target.cuda()

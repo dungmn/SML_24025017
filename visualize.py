@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 #Plot results
 # np.save('jaggArchs',jaggArchs)
 Sizes = np.arange(0.1,2.1,0.3)
+archs = ['vgg16','resnet50','densenet201']
 
 jaggArchs = np.load('jaggArchs.npy', allow_pickle=True)
 plt.rcParams.update({'font.size': 8})
@@ -50,6 +51,6 @@ ax.spines['top'].set_visible(False)
 plt.xlabel('Crop size')
 plt.ylabel('Accuracy')
 plt.tight_layout()
-# plt.legend(archs)
+plt.legend(archs)
 # plt.show()
-plt.savefig('CheckTranslationInvariance.png',bbox_inches='tight')
+plt.savefig('CheckTranslationInvariance.pdf',bbox_inches='tight')
